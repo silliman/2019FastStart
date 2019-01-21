@@ -124,84 +124,100 @@ Type this::
 
  bcuser@ubuntu16045:~/zmarbles/marblesUI/config$ more connection_profile1.json
 
-This command will print as much of the file as it can on your screen but will pause until you hit enter before displaying the rest of the file’s contents.  
-I will go over the sections in this file- hit enter as my explanations go past what you currently see visible and the next screen’s worth of the file will be displayed.
+This command will print as much of the file as it can on your screen but will pause until you hit enter before displaying the rest of the file’s contents.  Here are the complete contents of this file::
 
-*orderers* specifies an array of orderer nodes.  
-In your configuration file, the array has one entry, which is a map with three entries, *discovery*, *msp_id*, and *tls_certificate*.
-
-*	The discovery value is the URL of the orderer service-  it listens on port 7050 and uses the grpcs (secure grpc) protocol.  
-*	The msp_id value is the MSP name for the orderer. Each organization that participates in a Hyperledger Fabric network must have a unique MSP name. 
-*	The tls_certificate value of cert_1 is a pointer to another section in the file I’ll discuss later.
-
-::
-
-         "orderers": [
-            {   
-                "discovery": "grpcs://localhost:7050",
-                "msp_id": "OrdererMSP",
-                "tls_certificate": "cert_1"
-            }
-         ],
-
-*cas* specifies an array of certificate authority nodes.  
-In your configuration file, the array has one entry, a map with four entries:
-
-* The *api* value is the URL of the certificate authority service- it listens on port 7054 and uses the https protocol.
-
-*	The *msp_id* value is the MSP name for the “United Marbles” company.  This certificate authority and the peer nodes for “United Marbles” share the same name, *Org0MSP*.
-
-*	The *users* value is an array of authorized users of the certificate authority.
-
-*	The *tls_certificate* value of *cert_2* is a pointer to another section in the file I’ll discuss later.
-
-::
-
-        "cas": [
-            {   
-                "api": "https://localhost:7054",
-                "msp_id": "Org0MSP",
-                "users": [
-                    {   
-                        "enrollId": "admin",
-                        "enrollSecret": "adminpw"
-                    }
-                ],
-                "tls_certificate": "cert_2"
-            }
-        ],
-        
-*peers* specifies an array of peers that the Marbles app will use to send transaction proposals to. 
-In your configuration file only one peer is specified.  
-It listens on port 7051 for requests, and the peer provides an event hub service that listens on port 7053. 
-Note that United Marbles has two peers in the network, but only one of them is specified here.  
-This means that the peer specified here will take on the endorsement and committer role for the marbles chaincode, but the other peer not specified here will take on only the committer role for the marbles chaincode.
-
-::
-
-        "peers": [
-            {   
-                "name": "peer0.unitedmarbles.com",
-                "discovery": "grpcs://localhost:7051",
-                "events": "grpcs://localhost:7053",
-                "msp_id": "Org0MSP",
-                "tls_certificate": "cert_3"
-            }
-        ],
-        
-The *app* value is a map of other definitions needed by the marbles app, including:
-
-*	the channel on which the chaincode has been *instantiated* 
-*	the chaincode id and version given in the chaincode *install* and *instantiate* commands.
-
-::
-
-        "app": {
-            "channel_id": "mychannel",
-            "chaincode_id": "marbles",
-            "chaincode_version": "1.0",
-            "block_delay": 1000
-        },
+ {
+ 	"name": "Docker Compose Network",
+ 	"x-networkId": "not-important",
+ 	"x-type": "hlfv1",
+ 	"description": "Connection Profile for an IBM Blockchain Network",
+ 	"version": "1.0.0",
+ 	"client": {
+ 		"organization": "Org0MSP"
+ 	},
+ 	"channels": {
+ 		"mychannel": {
+ 			"orderers": [
+ 				"fabric-orderer"
+ 			],
+ 			"peers": {  
+  				"fabric-peer-org1" : {
+                                    "x-chaincode": {}
+                                 }
+ 			},
+ 			"chaincodes": [
+ 				"marbles:v4"
+ 			],
+ 			"x-blockDelay": 1000
+ 		}
+ 	},
+ 	"organizations": {
+ 		"Org0MSP": {
+ 			"mspid": "Org0MSP",
+ 			"peers": [
+ 				"fabric-peer-org1"
+ 			],
+ 			"certificateAuthorities": [
+ 				"fabric-ca-org1"
+ 			]
+ 		}
+ 	},
+ 	"orderers": {
+ 		"fabric-orderer": {
+ 			"url": "grpcs://localhost:7050",
+ 			"grpcOptions": {
+ 				"ssl-target-name-override": "orderer.blockchain.com",
+ 				"grpc.http2.keepalive_time": 300,
+ 				"grpc.keepalive_time_ms": 300000,
+ 				"grpc.http2.keepalive_timeout": 35,
+ 				"grpc.keepalive_timeout_ms": 3500
+ 			},
+ 			"tlsCACerts": {
+ 				"path": "../../crypto-config/ordererOrganizations/blockchain.com/orderers/orderer.blockchain.com/tls/ca.crt"
+ 			}
+ 		}
+		
+ 	},
+ 	"peers": {
+ 		"fabric-peer-org1": {
+ 			"url": "grpcs://localhost:7051",
+ 			"eventUrl": "grpcs://localhost:7053",
+ 			"grpcOptions": {
+ 				"ssl-target-name-override": "peer0.unitedmarbles.com",
+ 				"grpc.http2.keepalive_time": 300,
+ 				"grpc.keepalive_time_ms": 300000,
+ 				"grpc.http2.keepalive_timeout": 35,
+ 				"grpc.keepalive_timeout_ms": 3500
+ 			},
+ 			"tlsCACerts": {
+ 				"path": "../../crypto-config/peerOrganizations/unitedmarbles.com/peers/peer0.unitedmarbles.com/tls/ca.crt"
+ 			}
+ 		}
+ 	},
+ 	"certificateAuthorities": {
+ 		"fabric-ca-org1": {
+ 			"url": "https://localhost:7054",
+ 			"httpOptions": {
+ 				"ssl-target-name-override": "ca.unitedmarbles.com",
+ 				"verify": true
+ 			},
+ 			"tlsCACerts": {
+ 				"path": "../../crypto-config/peerOrganizations/unitedmarbles.com/ca/ca.unitedmarbles.com-cert.pem"
+ 			},
+ 			"registrar": [
+ 				{
+ 					"enrollId": "admin",
+ 					"enrollSecret": "adminpw"
+ 				}
+ 			],
+ 			"caName": "ca-org0"
+ 		}
+ 	}
+ }
+ 
+This is a standard Hyperledger Fabric connection profile. This lab does not use Hyperledger Composer, but I think the Hyperledger Composer team did a nice job describing Hyperledger Fabric connection profiles, as they use them too. 
+See https://hyperledger.github.io/composer/latest/reference/connectionprofile for their description.
+They also reference a link in the Hyperledger Fabric Node.js SDK documentation at https://fabric-sdk-node.github.io/tutorial-network-config.html which is a little more advanced, and it describes the profile in YAML form versus the JSON form that this Marbles demo app uses.
         
 **IMPORTANT: if you used a channel name other than the default of mychannel, you must change this value from mychannel to the value youused.** 
 Either use the *vi* editor if you are comfortable with that, or, you could use *sed*.  
@@ -220,29 +236,6 @@ For example, here is a *sed* command, to change the channel name from *mychannel
  connection_profile2.json-	},
  connection_profile2.json:	"channels": {
  connection_profile2.json-		"tim": {
-
-The *tls_certificates* value is a map of name/value pairs associated with certificates used for TLS handshaking:
-
-*	*cert_1* is used by the orderer service
-*	*cert_2* is used by the United Marbles certificate authority service
-*	*cert_3* is used by the United Marbles peer specified in the *peers* section of this file
-
-::
-
-        "tls_certificates": {
-            "cert_1": {
-                "common_name": "orderer.blockchain.com",
-                "pem": "../../crypto-config/ordererOrganizations/blockchain.com/orderers/orderer.blockchain.com/tls/ca.crt"
-            },
-            "cert_2": {
-                "common_name": "ca.unitedmarbles.com",
-                "pem": "../../crypto-config/peerOrganizations/unitedmarbles.com/ca/ca.unitedmarbles.com-cert.pem"
-            },
-            "cert_3": {
-                "common_name": "peer0.unitedmarbles.com",
-                "pem": "../../crypto-config/peerOrganizations/unitedmarbles.com/peers/peer0.unitedmarbles.com/tls/ca.crt"
-            }
-        }
         
 **Step 2.12:** The considerations for *marbles2.json* and *connection_profile2.json* are the same as for *marbles1.json* 
 and *connection_profile1.json* except that they apply to “Marbles Inc.” instead of “United Marbles”.  
