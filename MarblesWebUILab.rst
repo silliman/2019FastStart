@@ -219,7 +219,7 @@ This is a standard Hyperledger Fabric connection profile. This lab does not use 
 See https://hyperledger.github.io/composer/latest/reference/connectionprofile for their description.
 They also reference a link in the Hyperledger Fabric Node.js SDK documentation at https://fabric-sdk-node.github.io/tutorial-network-config.html which is a little more advanced, and it describes the profile in YAML form versus the JSON form that this Marbles demo app uses.
         
-**IMPORTANT: if you used a channel name other than the default of mychannel, you must change this value from mychannel to the value youused.** 
+**IMPORTANT: if you used a channel name other than the default of mychannel, you must change this value from mychannel to the value you used.** 
 Either use the *vi* editor if you are comfortable with that, or, you could use *sed*.  
 For example, here is a *sed* command, to change the channel name from *mychannel* to *tim*, along with “before” and “after” *grep* commands to show the changes
 **(These commands are examples and only needed if you did not use the default channel name of mychannel)**::
@@ -473,7 +473,7 @@ The syntax is a bit arcane, and this is not a course in JavaScript, but there is
 
  var cp = require(__dirname + '/utils/connection_profile_lib/index.js')(process.env.creds_filename, logger);
 
-Then witin *utils/connection_profile_lib/index.js* is where all the magic, a.k.a. code, happens to make use of the values specified in that file.
+Then within *utils/connection_profile_lib/index.js* is where all the magic, a.k.a. code, happens to make use of the values specified in that file.
 
 You did not need to know all this to run the application, but you might need to know where to start looking when your boss asks you to tailor the marbles application because she wants a return on the time and money you spent taking this lab-  assuming you don’t get off the hook when you tell her that nowhere was JavaScript mentioned on the agenda.
 
@@ -509,7 +509,7 @@ Click the '+' sign to see information about your environment and your marbles ch
 .. image:: images/lab3/2019-01-20_13-22-12_GuidedStep4-010.png
 
 **Step 3.8:** Unlike the first three steps, which did not require further input from you to complete, this step will not proceed until you click the *Create* button.
-Before you do that you have an opportunity to review and change the names that you use for new marbles owners in addition to the owner named 'Barry' that should already exist if you created it in the first part of this lab.
+Before you do that you have an opportunity to review and change the names that you use for new marbles owners in addition to the owner named 'Barry' that should already exist (though not evident from this screen) if you created it in the first part of this lab.
 
 Click the *Create* button when you are ready and after several seconds you should see *Step 4 Complete* on the screen:
 
@@ -678,8 +678,8 @@ List the contents of *marbles2.json* file (switch to a free PuTTY session or sta
 If you peek at your browser session from United Marbles, (port 3001), you will not notice any changes yet.
 
 **Step 3.13:** Open a browser tab or window and navigate to *http://<your_IP_here>:3002*. 
-You will again be givin a choice of *Express* or *Guided* and feel free to choose whichever path suits your fancy.
-If you choose *Express*, everything should hopefully sail through until yos see a screen with all Marbles Inc. owners and marbles, as well as all United Marbles owners and marbles:
+You will again be given a choice of *Express* or *Guided* and feel free to choose whichever path suits your fancy.
+If you choose *Express*, everything should hopefully sail through until you see a screen with all Marbles Inc. owners and marbles, as well as all United Marbles owners and marbles:
 
 .. image:: images/lab3/MarblesIncUpdatedPage.png
    
@@ -704,6 +704,6 @@ When you do things as one user, e.g. as the United Marbles admin, go to the othe
 *	Break out the previous lab’s material and enter the *cli* container and issue some commands to create, update or delete marbles.  See if the Marbles UI reflects your changes
 *	Look at some of the marbles chaincode container logs while you work with the Marbles UI -	**Hint:**  *docker logs [-f] container_name* will show a container’s log.  Try it without the optional *-f* argument first and then try it with it.   *-f* ties up your terminal session but then shows new log messages as they are created.  Press **Ctrl-c** to get out of it.
 * Look at the peer or orderer logs while you work with the Marbles UI
-*	Click the **Setup Help** button in the upper left in the Marbles UI and then number *4* in the window that pops up.  Edit the list of names at the bottom and click **Create**.  Do your new users show up in both companies’ sessions?  What happens if you add a name that exists already?
+*	Click the **Start Up Help** button in the upper left in the Marbles UI and then number *4* in the window that pops up.  Edit the list of names at the bottom and click **Create**.  Do your new users show up in both companies’ sessions?  What happens if you add a name that exists already?
  
 **End of lab!**
