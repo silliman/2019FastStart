@@ -194,4 +194,4 @@ Summary
 
 In this guided lab of Immunichain, you created 3 different participants: a guardian, a medical provider and a member. Then having created a guardian, we create a child. Using our child, Dennis, we added immunization shots and showed that from the members perspective. Knowing that our member could see the immunization record, we revoked their access to the medical record. We did that by going to the guardian perspective and deauthorizing the member. To reconfirm that we revoked the member's access to the immunization record, we went back to our member and saw the message saying that we ``Don't have any children`` meaning that KennysCamp wasn't authorized to see anyone's medical record. 
 
-Moving forward, what ways do you think you could improve this blockchain network? How would insurance effect this network? What missing componets do you think would benefit this network? 
+Moving forward, what ways do you think you could improve this blockchain network? How would insurance effect this network? What missing components do you think would benefit this network? 
