@@ -40,8 +40,9 @@ chaincode. I will explain later in the lab the difference between the
 install and instantiate actions and what each one does.
 
 Section 2 - Description of the subsequent sections in this lab
-============================================================== This
-section provides a brief description of the subsequent sections in the
+============================================================== 
+
+This section provides a brief description of the subsequent sections in the
 lab, where you will get hands-on experience with the Hyperledger Fabric
 command line interface (CLI). In most production implementations you
 would perform many of these functions through other means, such as
@@ -94,7 +95,7 @@ works.
     performed on them. This collection of Key/Value pairs is often
     referred to as state data.
 
-  Section 3 - Extract the artifacts necessary to run the lab
+Section 3 - Extract the artifacts necessary to run the lab
 ==========================================================
 
 Log in to your assigned Linux on Z Ubuntu instance with the instructions
@@ -216,8 +217,9 @@ working with the brwoser-based user interface (UI) for Marbles.
 
 The *scripts* directory contains a script named *setpeer* that you will
 be using throughout this lab from within the *cli* Docker container.
-*setpeer* will be explained in *Section 5*.   Section 4 - Bring up the
-twelve Docker containers that comprise the Hyperledger Fabric network
+*setpeer* will be explained in *Section 5*.   
+
+Section 4 - Bring up the twelve Docker containers that comprise the Hyperledger Fabric network
 ==============================================================================================
 
 **Step 4.1:** Change to the *zmarbles* directory with the *cd* command:
@@ -608,8 +610,9 @@ in the output below, you are ready to proceed to the next section:
     bcuser@ubuntu16045:~/zmarbles$ 
 
 Section 5 - Create a channel in the Hyperledger Fabric network
-============================================================== In a
-Hyperledger Fabric v1.4.0 network, multiple channels can be created.
+============================================================== 
+
+In a Hyperledger Fabric v1.4.0 network, multiple channels can be created.
 Each channel can have its own policies for things such as requirements
 for endorsement and what organizations may join the channel. This allows
 for a subset of network participants to participate in their own
@@ -757,7 +760,9 @@ for the channel, which is block 0. Programmers love to start counting
 things at zero instead of one- it makes them feel special.
 
 Proceed to the next section where you will join each peer to the
-channel.   Section 6 - Instruct each peer node to join the channel
+channel.   
+
+Section 6 - Instruct each peer node to join the channel
 =======================================================
 
 In the last section, you issued the *peer channel create* command from
@@ -940,8 +945,7 @@ see your channel listed in the output:
     Channels peers has joined: 
     mychannel
 
-  Section 7 - Define an "anchor" peer for each organization in the
-channel
+Section 7 - Define an "anchor" peer for each organization in the channel
 =======================================================================
 
 An anchor peer for an organization is a peer that can be known by all
@@ -1096,8 +1100,9 @@ install the chaincode once on that peer.
 Installing chaincode on a peer is a necessary step, but not the only
 step needed, in order to execute chaincode on that peer. The chaincode
 must also be instantiated on a channel that the peer participates in.
-You will do that in the next section.   Section 9 - Instantiate the
-chaincode on the channel
+You will do that in the next section.   
+
+Section 9 - Instantiate the chaincode on the channel
 ====================================================
 
 In the previous section, you installed chaincode on two of your four
