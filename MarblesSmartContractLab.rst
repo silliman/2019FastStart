@@ -1170,7 +1170,7 @@ Your command prompt should change to reflect that you are now back at your Linux
  bcuser@ubuntu16045:~/zmarbles$ 
 
 
-**Step 10.18:**	Congratulations for making through the treacherous portion of the lab!
+**Step 10.18:**	Congratulations for making it through the treacherous portion of the lab!
 
 Stay logged in to your two terminal sessions and 
 leave your Hyperledger Fabric network and all the chaincode Docker containers up and running-  you will use what you created here in the next lab where you will install a front-end application offering a browser-based UI from which you will interact with the marbles chaincode that you have installed in this lab.
