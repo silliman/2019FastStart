@@ -17,13 +17,13 @@ containers, as follows:
 You will also bring up a twelfth Docker container that we will call the *cli* container.  You will use it as a convenience to enter 
 Hyperledger Fabric commands targeted to specific peers.  You will see how this is done later in the lab.
 
-The network you bring up will use Transport Layer Security (TLS) which provides secure, encrypted communications between the peer nodes and the orderer, just as most "real world" implementations will require.
+The network you bring up will use Transport Layer Security (TLS) which provides secure, encrypted communications between the peer nodes and the orderer, just as most production implementations will require.
 
 You will **install** the Marbles chaincode on the peer nodes, **instantiate** the chaincode, and **invoke** functions of the chaincode.  I will explain later in the lab the difference between the install and instantiate actions and what each one does.
 
 Section 2	- Description of the subsequent sections in this lab
 ==============================================================
-This section provides a brief description of the subsequent sections in the lab, where you will get hands-on experience with the Hyperledger Fabric command line interface (CLI). In the "real world" you would perform many of these functions through other means, such as programmatically through a Hyperledger Fabric API, which the project provides for the Node.js, Java, Golang and Python programming languages, or perhaps through a user interface such as the one provided by the IBM Blockchain Platform, but using the CLI is a great way to learn about how Hyperledger Fabric works.
+This section provides a brief description of the subsequent sections in the lab, where you will get hands-on experience with the Hyperledger Fabric command line interface (CLI). In most production implementations you would perform many of these functions through other means, such as programmatically through an Application Programming Interface (API) provided by a Hyperledger Fabric Software Development Kit (SDK), which the project provides for the Node.js, Java, Golang and Python programming languages, or perhaps through a user interface such as the one provided by the IBM Blockchain Platform. But using the CLI, as you will in this lab, is a great way to learn about how Hyperledger Fabric works.
 
 1.	You will extract the artifacts necessary to run the lab in Section 3.  All the artifacts necessary for the lab are provided in a compressed tarball- in essence, a zip file.
 2.	You will use Docker Compose in Section 4 to bring up the twelve Docker containers that comprise the Hyperledger Fabric network.  You will see that all twelve Docker containers that I mentioned in Section 1 are brought up with a single *docker-compose* command, and I will explain some of the more interesting bits of what is going on under the covers.
@@ -32,23 +32,26 @@ This section provides a brief description of the subsequent sections in the lab,
 5.	You will define an “anchor” peer for each organization in the channel in Section 7.  An anchor peer for an organization is a peer that is known by all the other organizations in a channel.  Not all peers for an organization need to be known by outside organizations.  Peers not defined as anchor peers are visible only within their own organization.
 6.	You will install the chaincode on the peer nodes in Section 8. Installing chaincode simply puts the chaincode executable on the file system of the peer.  It is a necessary step before you execute that chaincode on the peer, but the next step is also required.
 7.	You will instantiate the chaincode on the channel in Section 9.  This step is a prerequisite to being able to run chaincode on a channel.  It only needs to be performed on one peer that is a member of the channel.  This causes a transaction to be recorded on the channel’s blockchain to indicate that the chaincode can be run on the channel.
-8.	You will invoke functions on the chaincode that will create, read, update and delete (CRUD) data stored on the blockchain in Section 10. If you hear programmers use the word CRUD, unless they are talking about last Sunday’s football game, they are probably talking about Creating, Reading, Updating, or Deleting data.   Blocks of transactions in a blockchain are always added (i.e., Created), and they can be Read, but they should never, ever, ever, in normal operations, be Updated or Deleted.   However, although the blocks in a chain are not updated or deleted, the transactions themselves operate on Key/Value pairs that can have all CRUD operations performed on them.  This collection of Key/Value pairs is often referred to as state data. 
+8.	You will invoke functions on the chaincode that will create, read, update and delete (CRUD) data stored on the blockchain in Section 10.  Blocks of transactions in a blockchain are always added (i.e., created), and they can be read, but they are never, in normal operations, updated or deleted.   However, although the blocks in a chain are not updated or deleted, the transactions themselves operate on Key/Value pairs that can have all CRUD operations performed on them.  This collection of Key/Value pairs is often referred to as state data. 
 
 
  
 Section 3 -	Extract the artifacts necessary to run the lab
 ==========================================================
 
-Log in to your assigned Linux on Z Ubuntu instance to perform all steps in this lab with the instructions provided to you by your class instructor.
+Log in to your assigned Linux on Z Ubuntu instance with the instructions provided to you by your class instructor.
+If you are using Linux or MacOS you will likely be using *ssh* to log in via a *Terminal* window.
+If you are using Windows, you will most likely be using a *PuTTY* terminal session.
 If you are trying this lab at home, I am assuming you can figure out how to log in.
-If not, send me your name, address, date of birth, social security number, bank account and bank routing number, email address, credit card number with expiration date, the name of your first pet and your high school mascot, and I will provide further instructions to you.
 
-Shall we begin?
+All of the following instructions in the lab assume that you have successfully logged in to the Linux on Z Ubuntu instance assigned to your team. As you proceed through the lab, you will have to be logged in to more than one terminal session. When that becomes necessary, simply follow the same procedure used to log in to your first terminal session.
+
+Let's get started!
 
 **Step 3.1:**	Navigate to the home directory by entering *cd ~* (the “tilde” character, i.e., ‘*~*’, represents the user’s home directory in Linux).  
 This directory is also usually set in the $HOME environment variable, so *cd $HOME* will also usually get you to your home directory::
 
- bcuser@ubuntu16045:~/git/src/github.com/hyperledger/fabric-sdk-node$ cd ~
+ bcuser@ubuntu16045:~$ cd ~
  bcuser@ubuntu16045:~$ 
  
 *Note:* You may already be in your home directory prior to entering *cd ~*, in which case you'll just stay there- not a problem.
@@ -73,8 +76,8 @@ This directory is also usually set in the $HOME environment variable, so *cd $HO
  ls: cannot access 'zmarbles': No such file or directory
  
 **Step 3.4:**	Extract the *zmarbles.tar.gz* file which will create the missing directory (and lots of subdirectories).  
-If you are not giddy yet, try tucking the “*v*” switch into the options in the command below.  That is, use *-xzvf* instead of *-xzf*.  
-So, enter the command below as shown, or feel free to substitute *-xzvf* for *-xzf* in the tar command (the “*v*” is for “*verbose*”)
+If you want to see the name of all of the files and directories that are extracted, add the “*v*” switch into the options in the command below.  That is, use *-xzvf* instead of *-xzf*.  
+So, enter the *tar* command below as shown, feeling free to substitute *-xzvf* for *-xzf* in the command (the “*v*” is for “*verbose*”)
 ::
 
  bcuser@ubuntu16045:~$ tar -xzf zmarbles.tar.gz 
@@ -102,13 +105,13 @@ The *base* directory contains Docker Compose files that are included in the *doc
 
 The *bin* directory contains two executable programs, *cryptogen* and *configtxgen*, that will be run later when you execute the *generateArtifacts.sh* script.
 
-The *channel-artifacts* directory is empty, but it must exist when the *generateArtifacts.sh* script, which you will run later, invokes the *configtxgen* utility which generates channel configuration transaction inputs.
+The *channel-artifacts* directory is empty, but it must exist when the *generateArtifacts.sh* script, which you will run later, invokes the *configtxgen* utility. The *configtxgen* utility generates input to channel configuration transaction inputs, and it is expecting the *channel-artifacts* directory to exist.
 
 The *configtx.yaml* file is input to the *configtxgen* utility
 
 The *cryto-config.yaml* file is input to the *cryptogen* utiity, which is called by the *generateArtifacts.sh* script to create cryptographic material (in the form of X.509 certificates and public and private key pairs) used to identify peers, orderers, and administrative and regular users of a Hyperledger Fabric network.
 
-The *docker-compose-template.yaml* file is used as a template file that the *generateArtifacts.sh* script will use to create the main Docker Compose template file, *docker-compose.yaml* that contains definitions for all of the Docker containers that you will need.
+The *docker-compose-template.yaml* file is used as a template file that the *generateArtifacts.sh* script will use to create the main Docker Compose template file, *docker-compose.yaml*, which contains definitions for all of the Docker containers that you will need.
 
 The *examples* directory contains the actual Marbles chaincode within its subdirectory structure.
 
@@ -116,11 +119,9 @@ The *generateArtifacts.sh* script is used to generate channel configuration tran
 
 The *hostScripts* directory is not used in this lab.
 
-The *marblesUI* directory is used in the next lab, in which you will be working with the web UI for Marbles.
+The *marblesUI* directory is used in the next lab, in which you will be working with the brwoser-based user interface (UI) for Marbles.
 
-The *scripts* directory contains a script named *setpeer* that you will be using throughout this lab from within the *cli* Docker container. This will be explained further in *Section 5*.
-
-Congratulations!  You are now ready to get to the hard part of the lab!  Proceed to the next section please.  
+The *scripts* directory contains a script named *setpeer* that you will be using throughout this lab from within the *cli* Docker container. *setpeer* will be explained in *Section 5*.
  
 Section 4	- Bring up the twelve Docker containers that comprise the Hyperledger Fabric network
 ==============================================================================================
@@ -136,7 +137,7 @@ If you do not specify this parameter, the channel name defaults to *mychannel*.
 You may choose to specify your own channel name.  
 E.g., if you wished to name your channel *tim*, then you would enter *./generateArtifacts.sh tim* instead of just *./generateArtifacts.sh* when directed below to enter the command.
 
-**Note:** If you pick your own channel name, it must start with a lowercase character, and only contain lowercase characters, numbers, or the dash ('-') character, or the period ('.'). 
+**Note: If you pick your own channel name, it must start with a lowercase character, and only contain lowercase characters, numbers, or the dash ('-') character, or the period ('.').**
 
 So, enter the command below, optionally specifying a custom channel name (not shown here) as the lone argument to the *generateArtifacts.sh* script::
 
@@ -236,10 +237,10 @@ You will use these inputs in *Section 7*.
  
 Actually, these files were created *before* the files listed in the prior step, *Step 4.3*, were created, because, among the many cryptographic artifacts created are the x.509 signing certificates for the organizations, which are baked into the *genesis.block* discussed in the prior step.
 
-You can see that there is a dizzying set of directories and files, containing things like CA root certificates, signing certificates, TLS certificates, corresponding private keys, and public keys, for certificate authorities, organizations, administrative and general users.  A thorough discussion of them is beyond the scope of this lab, but at some point in a glorious future the author hopes to document, perhaps in an appendix somewhere, the purpose of each file. The author wants world peace, too.  
+You can see that there is a dizzying set of directories and files, containing things like CA root certificates, signing certificates, TLS certificates, corresponding private keys, and public keys, for certificate authorities, organizations, administrative and general users.  A thorough discussion of them is beyond the scope of this lab.  
 
 **Note:** This utiltity created crypto material for both organizations, including private keys that each organization would keep secret and never share with the other organizations.
-You have created this for both organizations on a single server for purposes of this lab, but in the "real world" each organization would create their own material separately so that they could indeed keep their private keys to themselves.
+You have created this for both organizations on a single server for purposes of this lab, but in a production implementation each organization would create their own material separately so that they could indeed keep their private keys to themselves.
 Their public certificates, which are meant to be shared, are baked into the channel definitions for channels in which they participate.
 This allows peer nodes from all organizations in a channel to verify digital signatures of transaction requests and transaction endorsements from other organizations that are members of the channel.
 
@@ -397,8 +398,8 @@ The *Exited* status means something went wrong, and you should check with an ins
 If, however, all twelve of your Docker containers are in *Up* status, as in the output below, you are ready to proceed to the next section::
 
  bcuser@ubuntu16045:~/zmarbles$ docker ps --all
- CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                                              NAMES
- 91819c57c22c        hyperledger/fabric-tools                  "bash"                   59 seconds ago       Up 58 seconds                                                                                   cli
+ CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS              PORTS                                                                       NAMES
+ 91819c57c22c        hyperledger/fabric-tools                  "bash"                   59 seconds ago       Up 58 seconds                                                                                                             cli
  b62ea5779b10        hyperledger/fabric-peer                   "peer node start"        About a minute ago   Up 59 seconds       0.0.0.0:8051->7051/tcp, 0.0.0.0:8052->7052/tcp, 0.0.0.0:8053->7053/tcp      peer1.unitedmarbles.com
  d35dbd158520        hyperledger/fabric-peer                   "peer node start"        About a minute ago   Up About a minute   0.0.0.0:7051-7053->7051-7053/tcp                                            peer0.unitedmarbles.com
  f4421a4ec662        hyperledger/fabric-peer                   "peer node start"        About a minute ago   Up About a minute   0.0.0.0:10051->7051/tcp, 0.0.0.0:10052->7052/tcp, 0.0.0.0:10053->7053/tcp   peer1.marblesinc.com
@@ -593,7 +594,7 @@ Your output should look similar to this::
  2018-10-22 18:59:12.089 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer#
 
-**Step 6,8:** Repeat the *peer channel list* command and now you should see your channel listed::
+**Step 6.8:** Repeat the *peer channel list* command and now you should see your channel listed::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer channel list
  2018-10-22 18:59:38.267 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
@@ -772,8 +773,6 @@ You are looking for a message near the end of the output similar to what is show
  root@a20e5320179f:/opt/gopath/src/github.com/hyperledger/fabric/peer#
 
 **Note:** I won't have you repeat the "before" and "after" *peer chaincode list --installed* commands on any of the other peers on which you install it, but I won't take extraordinary measures to stop you if you insist on doing it.
-I'm easy to get along with.
-Although my wife might argue against this assertion.
 
 **Step 8.5:** Switch to *peer0* in *Org1MSP*::
 
@@ -818,26 +817,23 @@ I'll try to prove it to you in this section.
 
 Chaincode instantiation causes a transaction to occur on the channel, so even if a peer on the channel does not have the chaincode installed, it will be made aware of the instantiate transaction, and thus be aware that the chaincode exists and be able to commit transactions from the chaincode to the ledger-  it just would not be able to endorse a transaction on the chaincode.
 
-**Step 9.1:**	You want to stay signed in to the *cli* Docker container; however, you will also want to issue some Docker commands from your Linux on IBM Z host, so at this time open up a second PuTTY session and sign in to your Linux on IBM Z host.   
-For the remainder of this lab, I will refer to the session where you are in the *cli* Docker container as *PuTTY Session 1*, and this new session where you are at the Linux on IBM Z host as *PuTTY Session 2*.
+**Step 9.1:**	You want to stay signed in to the *cli* Docker container; however, you will also want to issue some Docker commands from your Linux on IBM Z host, so at this time open up a second terminal session and sign in to your Linux on IBM Z host.   
+For the remainder of this lab, I will refer to the session where you are in the *cli* Docker container as *Terminal Session 1*, and this new session where you are at the Linux on IBM Z host as *Terminal Session 2*.
 If you are running this lab from a Windows laptop you probably are using PuTTY.
-If you are running this lab from Linux or MacOS you are probably using terminal sessions and using *ssh*- in this case substitute "terminal session" for "PuTTY session" in your mind as you follow the instructions.
+If you are running this lab from Linux or MacOS you are probably using terminal sessions and using *ssh*.
 
 **Step 9.2:**	You are going to confirm that you do not have any chaincode Docker images created, nor any Docker chaincode containers running currently. 
-From PuTTY Session 2, enter this command and observe that all of your images begin with *hyperledger*::
+From Terminal Session 2, enter this command and observe that all of your images begin with *hyperledger*::
 
  bcuser@ubuntu16045:~$ docker images
  REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
- hyperledger/fabric-tools     1.4.0               4032f6069cf9        9 days ago          1.52GB
- hyperledger/fabric-orderer   1.4.0               a8875e4d43b3        9 days ago          147MB
- hyperledger/fabric-peer      1.4.0               598805b785db        9 days ago          153MB
- hyperledger/fabric-ca        1.4.0               c44392389f74        9 days ago          216MB
- hyperledger/fabric-couchdb   s390x-0.4.14        7afa6ce179e6        3 months ago        1.55GB
+ hyperledger/fabric-tools     1.4.0               4032f6069cf9        2 months ago        1.52GB
+ hyperledger/fabric-orderer   1.4.0               a8875e4d43b3        2 months ago        147MB
+ hyperledger/fabric-peer      1.4.0               598805b785db        2 months ago        153MB
+ hyperledger/fabric-ca        1.4.0               c44392389f74        2 months ago        216MB
+ hyperledger/fabric-couchdb   s390x-0.4.14        7afa6ce179e6        5 months ago        1.55GB
 
-**Note:** The tags in your output may differ from what is shown here, but you should not have any images that start with *dev-\**.
-
-If your output screen is “too busy”, try entering ``docker images dev-*`` and you should see very little output except for some column headings.   
-This will show only those images that begin with *dev-\**, of which there should not be any at this point in the lab.
+You should not have any images which begin with *dev-*, which is what your Docker chaincode images will start with, and at this point in the lab Docker chaincode images have not been created yet.
 
 **Step 9.3:** Now do essentially the same thing with *docker ps* and you should see all of the Docker containers for the 
 Hyperledger Fabric processes and CouchDB, but no chaincode-related Docker containers::  
@@ -865,7 +861,7 @@ Hyperledger Fabric processes and CouchDB, but no chaincode-related Docker contai
 
 Now that you have established that you have no chaincode-related Docker images or containers present, try to instantiate the chaincode.
 
-**Step 9.5:**	On PuTTY Session 1, switch to Peer 0 of Org0MSP by entering::
+**Step 9.5:**	On Terminal Session 1, switch to Peer 0 of Org0MSP by entering::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# source scripts/setpeer 0 0
  CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/unitedmarbles.com/peers/peer0.unitedmarbles.com/tls/ca.crt
@@ -879,13 +875,13 @@ Now that you have established that you have no chaincode-related Docker images o
  CORE_LOGGING_LEVEL=DEBUG
  CORE_PEER_ADDRESS=peer0.unitedmarbles.com:7051
 
-**Step 9.6:** On PuTTY Session 1, enter this command to list instantiated chaincodes on your channel.  Spoiler alert- there aren't any, so you will get an empty list::
+**Step 9.6:** On Terminal Session 1, enter this command to list instantiated chaincodes on your channel.  Spoiler alert- there aren't any, so you will get an empty list::
 
  root@a20e5320179f:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer chaincode list --instantiated --channelID ${CHANNEL_NAME}
  Get instantiated chaincodes on channel mychannel:
  root@a20e5320179f:/opt/gopath/src/github.com/hyperledger/fabric/peer# 
 
-**Step 9.7:** On PuTTY Session 1, issue the command to instantiate the chaincode on the channel::
+**Step 9.7:** On Terminal Session 1, issue the command to instantiate the chaincode on the channel::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer chaincode instantiate -o orderer.blockchain.com:7050 -n marbles -v 1.0 -c '{"Args":["init","1"]}' -P "OR ('Org0MSP.member','Org1MSP.member')" $FABRIC_TLS -C $CHANNEL_NAME
  2018-10-22 19:16:30.024 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
@@ -894,12 +890,11 @@ Now that you have established that you have no chaincode-related Docker images o
 **Note:**  In your prior commands, when specifying the channel name, you used lowercase ‘c’ as the argument, e.g., *-c $CHANNEL_NAME*.  
 In the *peer chaincode instantiate* command however, you use an uppercase ‘C’ as the argument to specify the channel name, e.g., *-C mychannel*, because -c is used to specify the arguments given to the chaincode. 
 Why *c* for arguments you may ask?  
-Well, the ‘*c*’ is short for ‘*ctor*’, which itself is an abbreviation for *constructor*, which is a fancy word object-oriented programmers use to refer to the initial arguments given when creating an object.  
-Some people do not like being treated as objects, but evidently chaincode does not object to being objectified.
+Well, the ‘*c*’ is short for ‘*ctor*’, which itself is an abbreviation for *constructor*, which is a fancy word object-oriented programmers use to refer to the initial arguments given when creating an object.
 
 **Step 9.8:**	You may have noticed a longer than usual pause before you got your command prompt back while that last command was being run.  
 The reason for this is that as part of the instantiate, a Docker image for the chaincode is created and then a Docker container is started from the image.  
-To prove this to yourself, on PuTTY Session 2, enter this to see the new Docker image::
+To prove this to yourself, on Terminal Session 2, enter this to see the new Docker image::
 
  bcuser@ubuntu16045:~$ docker images dev-*
  REPOSITORY                                                                                                 TAG                 IMAGE ID            CREATED              SIZE
@@ -920,7 +915,7 @@ In our case of *dev-peer0.unitedmarbles.com-marbles-1.0-*, the default name of a
 Note that a chaincode Docker container was only created for the peer on which you entered the *peer chaincode instantiate* command.  
 Docker containers will not be created on the other peers until you run a *peer chaincode invoke* or *peer chaincode query* command on that peer.
 
-**Step 9.10:** Repeat the command from *Step 9.6* to see that your instantiated chaincode on your channel is now listed::
+**Step 9.10:** In Terminal Session 1 repeat the command from *Step 9.6* to see that your instantiated chaincode on your channel is now listed::
 
  root@a20e5320179f:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer chaincode list --instantiated --channelID ${CHANNEL_NAME}
  Get instantiated chaincodes on channel mychannel:
@@ -951,15 +946,13 @@ Switch to another peer::
  root@a20e5320179f:/opt/gopath/src/github.com/hyperledger/fabric/peer# 
 
 I would never lie to you.
-Just don't ask me if that dress makes you look fat.
-Thanks, dude.
 
 Section 10 - Invoke chaincode functions
 =======================================
 
 You are now ready to invoke chaincode functions that will create, read, update and delete data in the ledger.
 
-In this section, you will enter *scripts/setpeer* and *peer chaincode commands* in PuTTY session 1, while you will enter *docker ps* and *docker images* commands in PuTTY session 2.
+In this section, you will enter *scripts/setpeer* and *peer chaincode commands* in Terminal session 1, while you will enter *docker ps* and *docker images* commands in Terminal session 2.
  
 **Step 10.1:** Switch to peer0 of Org0MSP::
 
@@ -978,7 +971,7 @@ In this section, you will enter *scripts/setpeer* and *peer chaincode commands* 
 If you would like to use a different name than John, that is fine but then there will be other places later where you would  need to use your “custom” name instead of John.  
 And John's the guy who first got this lab working about three years ago so I think he deserves a marble, don't you, so if you do want to show off and change the name then I'm going to let you figure out later where it might need to be changed.
 
-Enter this command in PuTTY session 1::
+Enter this command in Terminal session 1::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer chaincode invoke -n marbles -c '{"Args":["init_owner", "o0000000000001","John","Marbles Inc"]}' $FABRIC_TLS -C $CHANNEL_NAME
  2018-10-22 19:24:22.227 UTC [chaincodeCmd] InitCmdFactory -> INFO 001 Retrieved channel (mychannel) orderer endpoint: orderer.blockchain.com:7050
@@ -1009,7 +1002,7 @@ So, in the command you just entered, the *init_owner* function is called, and it
 It is logic within the *init_owner* function that cause updates to the channel’s ledger- subject to the transaction flow in Hyperledger Fabric v1.4.0-  that is, chaincode execution causes proposed updates to the ledger, which are only committed at the end of the transaction flow if everything is validated properly.  
 But it all starts with function calls inside the chaincode functions that ask for ledger state to be created or updated.
 
-**Step 10.4:**	Go to PuTTY session 2, and enter this Docker command and you will observe that you still only have a Docker image and a Docker container for peer0 of Org0MSP::
+**Step 10.4:**	Go to Terminal session 2, and enter this Docker command and you will observe that you still only have a Docker image and a Docker container for peer0 of Org0MSP::
 
  bcuser@ubuntu16045:~$ docker images dev-*
  REPOSITORY                                                                                                 TAG                 IMAGE ID            CREATED             SIZE
@@ -1026,7 +1019,7 @@ You will see soon that other peers will have their own chaincode Docker image an
 
 **Step 10.6:**	You created a marble owner in the previous step. 
 Now create a marble belonging to this owner.   
-Perform this from peer0 of Org1, so from PuTTY session 1, switch to Peer0 of Org1MSP::
+Perform this from peer0 of Org1, so from Terminal session 1, switch to Peer0 of Org1MSP::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# source scripts/setpeer 1 0
  CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/marblesinc.com/peers/peer0.marblesinc.com/tls/ca.crt
@@ -1051,14 +1044,14 @@ The owner is *John* (or your custom name) and his id is *o0000000000001*, and hi
 I cleverly decided that the letter ‘*o*’ stands for owner and the letter ‘*m*’ stands for marbles.  
 I put 12 leading zeros in front of the number 1 in case you wanted to stay late and create trillions of marbles and owners.
 
-**Step 10.8:**	In PuTTY session 2, issue the command to see that you have two Docker chaincode images::
+**Step 10.8:**	In Terminal session 2, issue the command to see that you have two Docker chaincode images::
 
  bcuser@ubuntu16045:~$ docker images dev-*
  REPOSITORY                                                                                                 TAG                 IMAGE ID            CREATED             SIZE
  dev-peer0.marblesinc.com-marbles-1.0-4077677f13838bacbfd8ff943e7348c00f3c4d6ca6e2838efd14204ca87ea12b      latest              10f11ae0735b        3 seconds ago       137MB
  dev-peer0.unitedmarbles.com-marbles-1.0-7e92f069adb7469939a96dcba723fa2019745461f05a562e81cec38e46424aa1   latest              9f1fc6820d01        2 minutes ago       137MB
  
-**Step 10.9:**	In PuTTY session 2, issue the command to see that you have two Docker chaincode containers::
+**Step 10.9:**	In Terminal session 2, issue the command to see that you have two Docker chaincode containers::
 
  bcuser@ubuntu16045:~$ docker ps --no-trunc | grep dev-*
  22d63701f033c108296dd5170b67d5a1a00a8bb8b93197bc95e8303bcfc5657a   dev-peer0.marblesinc.com-marbles-1.0-4077677f13838bacbfd8ff943e7348c00f3c4d6ca6e2838efd14204ca87ea12b      "chaincode -peer.address=peer0.marblesinc.com:7052"                                                                                                                                                                                                                   28 seconds ago      Up 27 seconds                                                                                   dev-peer0.marblesinc.com-marbles-1.0
@@ -1066,7 +1059,7 @@ I put 12 leading zeros in front of the number 1 in case you wanted to stay late 
  bcuser@ubuntu16045:~$ 
 
 **Step 10.10:**	You will create a new owner now.  
-Try it on Peer 1 of Org0MSP::
+From Terminal Session 1, try it on Peer 1 of Org0MSP::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# source scripts/setpeer 0 1
  CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/unitedmarbles.com/peers/peer1.unitedmarbles.com/tls/ca.crt
@@ -1087,7 +1080,7 @@ Go ahead and enter it and then read on for why it failed and how to correct the 
 
 What do you expect to happen when you enter this command?
 
-Well, I don’t expect you to know for sure, but what I expect, if you have followed these instructions exactly, is that the *invoke* will fail.  
+If you have followed these instructions exactly so far, the *invoke* will fail.  
 It will fail because you have not yet installed the chaincode on Peer 1 of Org0.  
 Here is the output which shows the error::
 
@@ -1099,21 +1092,21 @@ If you want a peer to perform the endorsing function for a transaction, the chai
 If that peer is a member of the channel on which the chaincode is instantiated, but has not had the chaincode installed on it, it will still perform the committer function and update its copy of the channel’s ledger when it receives valid transactions from the orderer, but it cannot endorse transaction proposals unless the chaincode has been installed on it.
 
 **Step 10.12**:	Correct things by installing the chaincode on peer1 of Org0.  
-In PuTTY session 1, enter this command, which should look familiar to you::
+In Terminal session 1, enter this command, which should look familiar to you::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer chaincode install -n marbles -v1.0 -p github.com/hyperledger/fabric/examples/chaincode/go/marbles
  2018-10-22 19:44:30.855 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
  2018-10-22 19:44:30.855 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
  2018-10-22 19:44:31.054 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
 
-**Step 10.13:**	Now, in PuTTY session 1, repeat the *peer chaincode invoke* command from *Step 10.9*.  
+**Step 10.13:**	Now, in Terminal session 1, repeat the *peer chaincode invoke* command from *Step 10.9*.  
 It should work this time::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# peer chaincode invoke -n marbles -c '{"Args":["init_owner","o0000000000002","Barry","United Marbles"]}' $FABRIC_TLS -C $CHANNEL_NAME
  2018-10-22 19:45:10.249 UTC [chaincodeCmd] InitCmdFactory -> INFO 001 Retrieved channel (mychannel) orderer endpoint: orderer.blockchain.com:7050
  2018-10-22 19:45:25.582 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 002 Chaincode invoke successful. result: status:200 
  
-**Step 10.14:**	Go back to PuTTY session 2 and enter the Docker command that will show you that you now have your third chaincode-related Docker image, the one just built for peer1 of Org0::
+**Step 10.14:**	Go back to Terminal session 2 and enter the Docker command that will show you that you now have your third chaincode-related Docker image, the one just built for peer1 of Org0::
 
  bcuser@ubuntu16045:~$ docker images dev-*
  REPOSITORY                                                                                                 TAG                 IMAGE ID            CREATED             SIZE
@@ -1139,7 +1132,7 @@ I won’t tell you which peer does not currently have the chaincode installed, b
 
 If you are ambitious and want to install the chaincode on that fourth peer, try the useful Docker commands I have shown you from PuTTY session 2 to see that the chaincode's Docker image and Docker containerare created when you invoke a transaction on that fourth peer.
 
-Try some or all of these commands from PuTTY session 1:
+Try some or all of these commands from Terminal session 1:
 
 Create a marble for Barry, i.e., owner o0000000000002::
 
@@ -1169,7 +1162,7 @@ Obtain all marble information again.  See if it matches your expectations based 
 
  peer chaincode invoke -n marbles -c '{"Args":["read_everything"]}' $FABRIC_TLS -C $CHANNEL_NAME
  
-**Step 10.17:** Exit the *cli* Docker container from PuTTY session 1.  
+**Step 10.17:** Exit the *cli* Docker container from Terminal session 1.  
 Your command prompt should change to reflect that you are now back at your Linux on IBM Z host prompt and no longer in the Docker container::
 
  root@acd1f96d8807:/opt/gopath/src/github.com/hyperledger/fabric/peer# exit
@@ -1177,9 +1170,9 @@ Your command prompt should change to reflect that you are now back at your Linux
  bcuser@ubuntu16045:~/zmarbles$ 
 
 
-**Step 10.18:**	Congratulations!! 
+**Step 10.18:**	Congratulations for making through the treacherous portion of the lab!
 
-Congratulations on your fortitude and perseverance.  
-Leave your Hyperledger Fabric network and all the chaincode Docker containers up and running-  you will use what you created here in the next lab where you will install a front-end Web application that will interact with the marbles chaincode that you have installed in this lab.
+Stay logged in to your two terminal sessions and 
+leave your Hyperledger Fabric network and all the chaincode Docker containers up and running-  you will use what you created here in the next lab where you will install a front-end application offering a browser-based UI from which you will interact with the marbles chaincode that you have installed in this lab.
 
 
