@@ -40,27 +40,20 @@ This directory will be created when you run an npm *install* in the next step, s
    .  (output not shown here)
    .
 
-**Step 2.5:** How much ‘there’ is there?  Run this command if you are curious.  I hope you are a speed reader::
- 
- bcuser@ubuntu16045:~/zmarbles/marblesUI$ ls -ltrR node_modules/
-   .
-   .  (output not shown here)
-   .
-
-**Step 2.6:** Change to the *config* directory::
+**Step 2.5:** Change to the *config* directory::
 
  bcuser@ubuntu16045:~/zmarbles/marblesUI$ cd config
  bcuser@ubuntu16045;~/zmarbles/marblesUI/config$ 
 
-**Step 2.7:** There are four files in this directory::
+**Step 2.6:** There are four files in this directory::
 
  bcuser@ubuntu16045:~/zmarbles/marblesUI/config$ ls
  connection_profile1.json  connection_profile2.json  marbles1.json  marbles2.json
  bcuser@ubuntu16045:~/zmarbles/marblesUI/config$ 
  
-**Step 2.8:** There are two files for the first fictitious company, *United Marbles*, and two files for the second fictitious 
+**Step 2.7:** There are two files for the first fictitious company, *United Marbles*, and two files for the second fictitious 
 company, *Marbles Inc.*  
-Look at this file with the *cat* command::
+Look at the *marbles1.json* file with the *cat* command::
 
  bcuser@ubuntu16045:~/zmarbles/marblesUI/config$ cat marbles1.json 
  {
@@ -77,7 +70,7 @@ Look at this file with the *cat* command::
     "last_startup_hash": ""
  }
 
-**Step 2.9:** Notice that this file points to one of the other existing files, *connection_profile1.json*, as the value of 
+**Step 2.8:** Notice that this file points to one of the other existing files, *connection_profile1.json*, as the value of 
 the *cred_filename* name/value pair.  
 You will look at that in a moment.  
 Take a note of the usernames array-  *amy*, *alice*, and *ava*.  
@@ -89,7 +82,7 @@ Here is an example of a command to change the name *alice* to *vincent*.
  bcuser@ubuntu16045:~/zmarbles/marblesUI/config$ sed -i "s/alice/vincent/" marbles1.json   # optional
  bcuser@ubuntu16045:~/zmarbles/marblesUI/config$
 
-**Step 2.10:** Here is the file after I changed *alice* to *vincent* with the previous sed command::
+**Step 2.9:** Here is the file after I changed *alice* to *vincent* with the previous sed command::
 
  bcuser@ubuntu16045:~/zmarbles/marblesUI/config$ cat marbles1.json 
  {
@@ -115,7 +108,7 @@ It is *3001* here.
 In the *marbles2.json* file for *Marbles Inc*, port *3002* will be specified.  
 This is how, later in this lab, you will pretend to be a user of one company or the other-  by using port 3001 in the URL to pretend to be a “United Marbles” user and by using port 3002 in the URL to pretend to be a “Marbles Inc” user.
 
-**Step 2.11:** It is time to look at the main configuration file the Marbles app uses. 
+**Step 2.10:** It is time to look at the main configuration file the Marbles app uses. 
 It is the file specified as the *cred_filename* value in the *marbles1.json* file.  
 This name *cred_filename* for the JSON name/value pair and the filename, *blockchain_creds1.json*, indicate that security credentials are specified in this file, and they are, but actually information about the Hyperledger Fabric network itself is specified in this file as well. 
 This file is too large to fit in one screen, so I will teach you one more Linux command, named *more*.  
@@ -237,7 +230,7 @@ For example, here is a *sed* command, to change the channel name from *mychannel
  connection_profile2.json:	"channels": {
  connection_profile2.json-		"tim": {
         
-**Step 2.12:** The considerations for *marbles2.json* and *connection_profile2.json* are the same as for *marbles1.json* 
+**Step 2.11:** The considerations for *marbles2.json* and *connection_profile2.json* are the same as for *marbles1.json* 
 and *connection_profile1.json* except that they apply to “Marbles Inc.” instead of “United Marbles”.  
 If you would like to compare the differences between *connection_profile1.json* and *connection_profile2.json*, try the *diff* command and observe its output. 
 This command lists sections of the two files that it finds different.  
