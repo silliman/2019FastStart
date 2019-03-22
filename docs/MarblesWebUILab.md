@@ -16,7 +16,7 @@ and see some of the Hyperledger Fabric concepts in action.
 Section 2: Marbles user interface setup
 =======================================
 
-**Step 2.1:** Switch to the *\~/zmarbles/marblesUI* directory:
+**Step 2.1:** Switch to the *~/zmarbles/marblesUI* directory:
 
     bcuser@ubuntu16045:~$ cd ~/zmarbles/marblesUI
     bcuser@ubuntu16045:~/zmarbles/marblesUI$ 
